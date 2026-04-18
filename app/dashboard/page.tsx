@@ -27,7 +27,7 @@ export default async function DashboardPage() {
 
   const { data: logs } = await supabase
     .from("symptom_logs")
-    .select("id, date, sleep_hours, stress_level, energy_level, symptoms")
+    .select("id, date, sleep_hours, stress_level, energy_level, symptoms, notes")
     .eq("user_id", user.id)
     .gte("date", since)
     .order("date", { ascending: true });
@@ -122,7 +122,7 @@ export default async function DashboardPage() {
         <AIInsights />
 
         {/* Recent logs */}
-        <RecentLogs logs={recentLogs} />
+        <RecentLogs logs={recentLogs} userId={user.id} />
       </main>
     </div>
   );

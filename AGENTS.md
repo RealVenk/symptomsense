@@ -3,3 +3,4 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+After completing each task, create a git commit with a short single-line message describing what was built. Use imperative tense e.g. "add edit and delete for symptom logs". Never commit broken code.
