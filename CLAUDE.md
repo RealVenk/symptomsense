@@ -17,10 +17,10 @@ A web app where users log symptoms daily (voice or form). AI analyses patterns a
 - [x] Supabase project created
 - [x] Environment variables set up
 - [x] Auth flow (login/signup)
-- [ ] Symptom log form
-- [ ] Voice → structured log extraction
-- [ ] Pattern detection AI
-- [ ] Correlation dashboard
+- [x] Symptom log form
+- [x] Voice → structured log extraction
+- [x] Pattern detection AI
+- [x] Correlation dashboard
 - [ ] Weekly AI summary
 
 ## Features (in priority order)
