@@ -6,6 +6,8 @@ import { SleepChart } from "@/components/dashboard/SleepChart";
 import { EnergyStressChart } from "@/components/dashboard/EnergyStressChart";
 import { RecentLogs } from "@/components/dashboard/RecentLogs";
 import { AIInsights } from "@/components/dashboard/AIInsights";
+import { CalendarHeatmap } from "@/components/dashboard/CalendarHeatmap";
+import { ForecastCard } from "@/components/dashboard/ForecastCard";
 
 function avg(values: (number | null)[]): string {
   const nums = values.filter((v): v is number => v !== null);
@@ -21,23 +23,29 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const sinceNinety = ninetyDaysAgo.toISOString().split("T")[0];
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const since = thirtyDaysAgo.toISOString().split("T")[0];
+  const sinceThirty = thirtyDaysAgo.toISOString().split("T")[0];
 
   const { data: logs } = await supabase
     .from("symptom_logs")
     .select("id, date, sleep_hours, stress_level, energy_level, symptoms, notes")
     .eq("user_id", user.id)
-    .gte("date", since)
+    .gte("date", sinceNinety)
     .order("date", { ascending: true });
 
   const allLogs = logs ?? [];
+  const logs30 = allLogs.filter((l) => l.date >= sinceThirty);
   const recentLogs = [...allLogs].reverse().slice(0, 7);
+  const totalLogCount = allLogs.length;
 
-  const avgSleep = avg(allLogs.map((l) => l.sleep_hours));
-  const avgEnergy = avg(allLogs.map((l) => l.energy_level));
-  const avgStress = avg(allLogs.map((l) => l.stress_level));
+  const avgSleep = avg(logs30.map((l) => l.sleep_hours));
+  const avgEnergy = avg(logs30.map((l) => l.energy_level));
+  const avgStress = avg(logs30.map((l) => l.stress_level));
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -104,11 +112,14 @@ export default async function DashboardPage() {
           />
         </div>
 
+        {/* Calendar heatmap */}
+        <CalendarHeatmap logs={allLogs} />
+
         {/* Charts */}
-        {allLogs.length > 0 ? (
+        {logs30.length > 0 ? (
           <div className="grid gap-4 lg:grid-cols-2">
-            <SleepChart data={allLogs} />
-            <EnergyStressChart data={allLogs} />
+            <SleepChart data={logs30} />
+            <EnergyStressChart data={logs30} />
           </div>
         ) : (
           <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-10 text-center">
@@ -120,6 +131,9 @@ export default async function DashboardPage() {
 
         {/* AI Insights */}
         <AIInsights />
+
+        {/* Tomorrow's Forecast */}
+        <ForecastCard totalLogs={totalLogCount} />
 
         {/* Recent logs */}
         <RecentLogs logs={recentLogs} userId={user.id} />
